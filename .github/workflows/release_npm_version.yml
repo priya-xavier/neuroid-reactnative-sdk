@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   createRelease:
-    if: github.event.pull_request.merged && startsWith(github.head_ref, 'releases/')
+    # if: github.event.pull_request.merged && startsWith(github.head_ref, 'releases/')
     runs-on: ubuntu-latest
     steps:
       - name: Main branch checkout
@@ -25,13 +25,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+      # # Setup .npmrc file to publish to npm
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18.x'
+      #     registry-url: 'https://registry.npmjs.org'
 
-      - run: npm ci
+      # - run: npm ci
 
       # - name: Publish to npm
       #   run: npm publish --tag latest
@@ -100,6 +100,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: triggerRNSandboxProd
     steps:
+      - name: Main branch checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm install
       - name: Create PR to reset android version to master snapshot
         run: |
           sed -i "s/:react-android-sdk:[0-9a-zA-Z.-]*/:react-android-sdk:master-SNAPSHOT/g" android/build.gradle
