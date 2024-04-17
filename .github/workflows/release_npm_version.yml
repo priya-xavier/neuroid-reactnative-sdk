@@ -33,32 +33,32 @@ jobs:
 
       - run: npm ci
 
-      - name: Publish to npm
-        run: npm publish --tag latest
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+      # - name: Publish to npm
+      #   run: npm publish --tag latest
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
-      - name: Retrieve package version
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "PACKAGE_VERSION=v${PACKAGE_VERSION}" >> $GITHUB_ENV
+      # - name: Retrieve package version
+      #   run: |
+      #     PACKAGE_VERSION=$(node -p "require('./package.json').version")
+      #     echo "PACKAGE_VERSION=v${PACKAGE_VERSION}" >> $GITHUB_ENV
 
-      - name: Create release
-        run: |
-          gh release create ${{ env.PACKAGE_VERSION }} --generate-notes --latest --title "${{ env.PACKAGE_VERSION }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Create release
+      #   run: |
+      #     gh release create ${{ env.PACKAGE_VERSION }} --generate-notes --latest --title "${{ env.PACKAGE_VERSION }}"
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update new commit to have "Latest" Tag
-        run: |
-          git config --global user.email developer@neuro-id.com
-          git config --global user.name neuroid-developer
-          set +e
-          git push origin :latest
-          git tag -d latest
-          git tag latest
-          git push origin latest
-          set -e
+      # - name: Update new commit to have "Latest" Tag
+      #   run: |
+      #     git config --global user.email developer@neuro-id.com
+      #     git config --global user.name neuroid-developer
+      #     set +e
+      #     git push origin :latest
+      #     git tag -d latest
+      #     git tag latest
+      #     git push origin latest
+      #     set -e
   triggerRNSandboxProd:
     name: Trigger React Native Prod Sandbox release
     runs-on: ubuntu-latest
@@ -66,33 +66,34 @@ jobs:
     steps:
       - name: Trigger ReactNative Sandbox Android Deployment
         run: |
-          curl \
-             -X POST \
-             -H "Accept: application/vnd.github.v3+json" \
-             -H "Authorization: token ${{ secrets.GPR_API_KEY }}" \
-             https://api.github.com/repos/Neuro-ID/neuroid-reactnative-sdk-sandbox/dispatches \
-             -d '{"event_type":"publish-prod-android","client_payload":{"version":"${{env.PACKAGE_VERSION}}", "message": "${{ github.event.commit.message }}"}}'
+          echo "test"
+      #     curl \
+      #        -X POST \
+      #        -H "Accept: application/vnd.github.v3+json" \
+      #        -H "Authorization: token ${{ secrets.GPR_API_KEY }}" \
+      #        https://api.github.com/repos/Neuro-ID/neuroid-reactnative-sdk-sandbox/dispatches \
+      #        -d '{"event_type":"publish-prod-android","client_payload":{"version":"${{env.PACKAGE_VERSION}}", "message": "${{ github.event.commit.message }}"}}'
 
-      - name: Trigger ReactNative Sandbox iOS Deployment
-        run: |
-          curl \
-            -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GPR_API_KEY }}" \
-            https://api.github.com/repos/Neuro-ID/neuroid-reactnative-sdk-sandbox/dispatches \
-            -d '{"event_type":"on-demand-testflight","client_payload":{"version":"${{env.PACKAGE_VERSION}}", "message": "${{ github.event.commit.message }}"}}'
+      # - name: Trigger ReactNative Sandbox iOS Deployment
+      #   run: |
+      #     curl \
+      #       -X POST \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       -H "Authorization: token ${{ secrets.GPR_API_KEY }}" \
+      #       https://api.github.com/repos/Neuro-ID/neuroid-reactnative-sdk-sandbox/dispatches \
+      #       -d '{"event_type":"on-demand-testflight","client_payload":{"version":"${{env.PACKAGE_VERSION}}", "message": "${{ github.event.commit.message }}"}}'
 
-      - name: Send Slack Notification on Failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_CHANNEL: ${{ secrets.MOBILE_SLACK_NOTIFICATIONS_CHANNEL }}
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: 'Failed to trigger React Native Sandbox release (Prod)'
-          SLACK_TITLE: Failed to trigger React Native Sandbox release (Prod)
-          SLACK_USERNAME: rtBot
-          SLACK_WEBHOOK: ${{ secrets.MOBILE_SLACK_WEBHOOK }}
+      # - name: Send Slack Notification on Failure
+      #   if: failure()
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_CHANNEL: ${{ secrets.MOBILE_SLACK_NOTIFICATIONS_CHANNEL }}
+      #     SLACK_COLOR: ${{ job.status }}
+      #     SLACK_ICON: https://github.com/rtCamp.png?size=48
+      #     SLACK_MESSAGE: 'Failed to trigger React Native Sandbox release (Prod)'
+      #     SLACK_TITLE: Failed to trigger React Native Sandbox release (Prod)
+      #     SLACK_USERNAME: rtBot
+      #     SLACK_WEBHOOK: ${{ secrets.MOBILE_SLACK_WEBHOOK }}
 
   resetAndroidVersion:
     name: default to master snapshot
