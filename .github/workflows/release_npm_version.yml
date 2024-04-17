@@ -113,7 +113,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: npm install
-      - name: Create PR to reset android version to master snapshot
+      - name: reset android version to master snapshot
         run: |
           sed -i "s/:react-android-sdk:[0-9a-zA-Z.-]*/:react-android-sdk:master-SNAPSHOT/g" android/build.gradle
           sed -i "s/:react-android-sdk-debug:[0-9a-zA-Z.-]*/:react-android-sdk-debug:master-SNAPSHOT/g" android/build.gradle
@@ -131,6 +131,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            git config --global user.email developer@neuro-id.com
+            git config --global user.name neuroid-developer
             const title = "Post-release/Reset android version to master-SNAPSHOT";
             const body = "Reset android version to master-SNAPSHOT";
             const headBranch = 'post-release-reset';
@@ -145,7 +147,7 @@ jobs:
                 head: headBranch,
                 base: baseBranch
               });
-              console.log(`Pull request ${response.data.number} created`);
+              console.log(`Pull request created`);
             };
 
             createPullRequest();
